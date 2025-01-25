@@ -15,6 +15,187 @@ from scipy.stats import entropy
 from scipy.spatial.distance import jensenshannon
 import numpy as np
 from scipy.special import rel_entr
+import csv
+import random
+import ollama
+
+def generate_characters(author=None, iterations=200, connotation=None):
+    output_file_path = 'characters_output.json'
+    log_file_path = 'log.txt'
+    writers = []
+
+    # Read writers from CSV if author is not specified
+    if author is None:
+        with open('writers.csv', mode='r') as file:
+            reader = csv.reader(file)
+            writers = [row[0] for row in reader]
+    else:
+        writers = [author]
+    
+    # Ensure JSON file exists and is properly formatted
+    if os.path.exists(output_file_path):
+        try:
+            with open(output_file_path, mode='r') as output_file:
+                existing_content = output_file.read().strip()
+                if existing_content:
+                    if not existing_content.endswith("]"):
+                        raise ValueError("Invalid JSON structure in output file.")
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"Error validating existing JSON file: {e}. Resetting the file.")
+            with open(output_file_path, mode='w') as output_file:
+                output_file.write("[]")
+    else:
+        with open(output_file_path, mode='w') as output_file:
+            output_file.write("[]")
+
+    connotations = [connotation] if connotation in ["Positive", "Negative"] else ["Positive", "Negative"]
+    
+    for writer in writers:
+        for con in connotations:
+            opposite_con = "Positive" if con == "Negative" else "Negative"
+            for _ in range(iterations):
+                response = ollama.chat(model='llama3.2', messages=[
+                    {
+                        "role": "system",
+                        "content": f"Imagine you are {writer}, the famous writer. Keep in mind the historical period, the location and the characteristics of the author when you will do the tasks."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Create a character to serve as the protagonist (or antagonist) of an unpublished novel by the writer you are interpreting, so keep in mind the historical period, the location and the characteristics of the author. The character should have a mix of traits, but the overall connotation must be {con}. It may have a couple of minor {opposite_con} traits, but these should not outweigh the {con} ones. Output the character description in JSON format in English. Ensure the adjectives describing physical and moral traits are strictly one or two words only. Ensure the connotation in the JSON is "{con}". The ethnicity must be an ethnic group, not a nationality. Provide only the JSON with no additional explanation or text before or after. Ensure the JSON strictly follows this structure:
+    {{
+      "name": "NAME SURNAME",
+      "ethnicity": "ETHNICITY",
+      "role in society": "ROLE",
+      "sex": "SEX",
+      "religion": "RELIGION",
+      "novel setting (time)": "era",
+      "novel setting (location)": "geographic area",
+      "connotation": "{con}",
+      "physical description": ["ADJECTIVE/FEATURE 1 (One word or maximum two)", "ADJECTIVE/FEATURE 2 (One word or maximum two)", "ADJECTIVE/FEATURE 3 (One word or maximum two)", "ADJECTIVE/FEATURE 4 (One word or maximum two)", "ADJECTIVE/FEATURE 5 (One word or maximum two)"],
+      "moral description": ["ADJECTIVE/FEATURE 1 (One word or maximum two)", "ADJECTIVE/FEATURE 2 (One word or maximum two)", "ADJECTIVE/FEATURE 3 (One word or maximum two)", "ADJECTIVE/FEATURE 4 (One word or maximum two)", "ADJECTIVE/FEATURE 5 (One word or maximum two)"],
+      "description": "text description",
+      "writer": "{writer}"
+    }}, """
+                    }
+                ])
+
+                # Process response
+                if 'message' in response and 'content' in response['message']:
+                    content = response['message']['content']
+                    with open(log_file_path, mode='a', encoding='utf-8') as log_file:
+                        log_file.write(f"Raw Response Content:\n{content}\n")
+                    
+                    content = content.strip()
+                    if content.endswith("}"):
+                        content += ","
+                    elif not content.endswith("},"):
+                        content += "},"
+                    
+                    try:
+                        character = json.loads(content[:-1])
+                        with open(output_file_path, mode='r+') as output_file:
+                            data = json.load(output_file)
+                            data.append(character)
+                            output_file.seek(0)
+                            json.dump(data, output_file, indent=4)
+                            output_file.truncate()
+                        
+                        with open(log_file_path, mode='a') as log_file:
+                            log_file.write("Character saved to characters_output.json\n")
+                    except json.JSONDecodeError as e:
+                        with open(log_file_path, mode='a') as log_file:
+                            log_file.write(f"Failed to decode JSON. Error: {e}\n")
+                else:
+                    with open(log_file_path, mode='a') as log_file:
+                        log_file.write("No valid response received.\n")
+
+def generate_characters_no_author(iterations=200, connotation=None):
+    output_file_path = 'characters_no_writer.json'
+    log_file_path = 'log.txt'
+
+    # Ensure JSON file exists and is properly formatted
+    if os.path.exists(output_file_path):
+        try:
+            with open(output_file_path, 'r', encoding='utf-8') as output_file:
+                existing_content = output_file.read().strip()
+                if existing_content:
+                    json.loads(existing_content)  # Validate JSON
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"Error validating existing JSON file: {e}. Resetting the file.")
+            with open(output_file_path, 'w', encoding='utf-8') as output_file:
+                json.dump([], output_file, indent=4)
+    else:
+        with open(output_file_path, 'w', encoding='utf-8') as output_file:
+            json.dump([], output_file, indent=4)
+
+    connotations = [connotation] if connotation in ["Positive", "Negative"] else ["Positive", "Negative"]
+    
+    for con in connotations:
+        opposite_con = "Positive" if con == "Negative" else "Negative"
+        
+        for _ in range(iterations):
+            response = ollama.chat(model='llama3.2', messages=[
+                {
+                    "role": "system",
+                    "content": (f"Imagine yourself as a writer fully immersed in any time period, geographic location "
+                                f"(Europe, Asia, North America, South America, Oceania, Middle East, Africa, etc.), "
+                                f"or cultural context that sparks your imagination. Feel free to craft your surroundings, "
+                                f"experiences, and inspirations to shape your unique perspective. The goal is to create "
+                                f"a positive character, even if they might have a few flaws or contradictions.")
+                },
+                {
+                    "role": "user",
+                    "content": (f"""
+Create a character to serve as the protagonist (or antagonist) of an unpublished novel by the writer you are interpreting. 
+Keep in mind the historical period, the location, and the characteristics of the author. The character should have a mix of traits, 
+but the overall connotation must be {con}. It may have a couple of minor {opposite_con} traits, but these should not outweigh the {con} ones.
+Output the character description in JSON format in English. Ensure the adjectives describing physical and moral traits are strictly one or two words only.
+Ensure the connotation in the JSON is "{con}". The ethnicity must be an ethnic group, not a nationality.
+Provide only the JSON with no additional explanation or text before or after. Ensure the JSON strictly follows this structure:
+{{
+  "name": "NAME SURNAME",
+  "ethnicity": "ETHNICITY (an ethnic group, not a nationality or country)",
+  "role in society (job, or social status, etc)": "ROLE",
+  "sex": "SEX",
+  "religion": "RELIGION",
+  "novel setting (time)": "ERA",
+  "novel setting (location)": "GEOGRAPHIC AREA",
+  "connotation": "{con}",
+  "physical description": ["ADJECTIVE 1", "ADJECTIVE 2", "ADJECTIVE 3", "ADJECTIVE 4", "ADJECTIVE 5"],
+  "moral description": ["ADJECTIVE 1", "ADJECTIVE 2", "ADJECTIVE 3", "ADJECTIVE 4", "ADJECTIVE 5"],
+  "description": "TEXT DESCRIPTION",
+  "writing period": "WRITER'S HISTORICAL PERIOD",
+  "writer social condition": "WRITER'S SOCIAL CONDITION"
+}}
+"""
+                    )
+                }
+            ])
+            
+            # Process response
+            if 'message' in response and 'content' in response['message']:
+                content = response['message']['content'].strip()
+                
+                with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                    log_file.write(f"Raw Response Content:\n{content}\n")
+                
+                try:
+                    character = json.loads(content)
+                    with open(output_file_path, 'r+', encoding='utf-8') as output_file:
+                        data = json.load(output_file)
+                        data.append(character)
+                        output_file.seek(0)
+                        json.dump(data, output_file, indent=4)
+                        output_file.truncate()
+                    
+                    with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                        log_file.write("Character saved to characters_no_writer.json\n")
+                except json.JSONDecodeError as e:
+                    with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                        log_file.write(f"Failed to decode JSON. Error: {e}\n")
+            else:
+                with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                    log_file.write("No valid response received.\n")
 
 def process_character_data(input_file_path, keys_to_extract=None, writer=""):
     if keys_to_extract is None:
