@@ -1,0 +1,223 @@
+Raw Response Content:
+{
+  "name": "Leah Patel",
+  "ethnicity": "Indian",
+  "role in society (job, or social status, etc)": "Healer",
+  "sex": "Female",
+  "religion": "Hindu",
+  "novel setting (time)": "Ancient India",
+  "novel setting (location)": "Ganges River Valley",
+  "connotation": "Positive",
+  "physical description": ["Tall", "Thin", "Dark hair", "Warm skin"],
+  "moral description": ["Kind", "Compassionate", "Courageous", "Resilient", "Selfless"],
+  "description": "A skilled healer with a deep understanding of ancient Indian medicine, Leah is driven by her desire to help others and bring people together.",
+  "writing period": "17th Century",
+  "writer social condition": "Upper-middle class"
+}
+Character saved to characters_no_writer.json
+Raw Response Content:
+{
+  "name": "Kaelin Blackwood",
+  "ethnicity": "Irish",
+  "role in society (job, or social status, etc)": "Thief",
+  "sex": "Male",
+  "religion": "Catholic",
+  "novel setting (time)": "18th century",
+  "novel setting (location)": "Europe",
+  "connotation": "Negative",
+  "physical description": ["Scrawny", "Pierced", "Tattooed", "Foul-smelling", "Disheveled"],
+  "moral description": ["Cowardly", "Deceitful", "Ruthless", "Reckless", "Amoral"],
+  "description": "A master thief with a penchant for violence, Kaelin Blackwood uses his cunning and stealth to exploit the wealthy elite.",
+  "writing period": "Victorian era",
+  "writer social condition": "Middle-class"
+}
+Character saved to characters_no_writer.json
+Raw Response Content:
+{
+  "name": "Kaito Yamada",
+  "ethnicity": "Japanese",
+  "role in society (job, or social status, etc)": "Scholar",
+  "sex": "Male",
+  "religion": "Shintoism",
+  "novel setting (time)": "Feudal Japan",
+  "novel setting (location)": "Eastern Asia",
+  "connotation": "Positive",
+  "physical description": ["Slim", "Brown Hair", "Hazel Eyes", "Tall", "Lean"],
+  "moral description": ["Fair", "Honorable", "Intelligent", "Compassionate", "Ambitious"],
+  "description": "Kaito is a well-respected scholar in his village, known for his wisdom and knowledge. He is often sought out for guidance by the villagers.",
+  "writing period": "17th century",
+  "writer social condition": "Middle-class"
+}
+Character saved to characters_no_writer.json
+Raw Response Content:
+{
+  "name": "Kaito Yamato",
+  "ethnicity": "Japanese",
+  "role in society (job, or social status, etc)": "Samurai",
+  "sex": "Male",
+  "religion": "Shinto",
+  "novel setting (time)": "Edo Period",
+  "novel setting (location)": "Japan",
+  "connotation": "Negative",
+  "physical description": ["Scarred", "Lean", "Pale", "Cold", "Tall"],
+  "moral description": ["Cruel", "Ambitious", "Vengeful", "Manipulative", "Proud"],
+  "description": "A ruthless and cunning samurai with a talent for strategy, Kaito is driven by a desire for power and revenge. He will stop at nothing to achieve his goals.",
+  "writing period": "17th Century",
+  "writer social condition": "Middle-class merchant's son"
+}
+Character saved to characters_no_writer.json
+Raw Response Content:
+{
+      "name": "Leonid Petrovich",
+      "ethnicity": "Slavic",
+      "role in society": "Artist",
+      "sex": "Male",
+      "religion": "Eastern Orthodox",
+      "novel setting (time)": "Mid-19th century",
+      "novel setting (location)": "Europe",
+      "connotation": "Positive",
+      "physical description": ["Tall", "Dark-haired", "Strong", "Weathered", "Intelligent"],
+      "moral description": ["Honorable", "Compassionate", "Independent", "Creative", "Resilient"],
+      "description": "Leonid Petrovich is a brilliant and enigmatic Slavonic artist, driven by an insatiable passion for his craft. His striking features and piercing eyes seem to hold the secrets of the universe, while his unwavering dedication to his work inspires awe in all who meet him.",
+      "writer": "Edgar Allan Poe"
+    }
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Kaelin Darkhaven",
+  "ethnicity": "Caucasian",
+  "role in society": "Outcast",
+  "sex": "Male",
+  "religion": "None",
+  "novel setting (time)": "19th century",
+  "novel setting (location)": "American South",
+  "connotation": "Negative",
+  "physical description": ["Tall", "Bony", "Piercing eyes", "Pale skin", "Scars"],
+  "moral description": ["Cruel", "Manipulative", "Ambitious", "Vicious", "Cold-hearted"],
+  "description": "A master of dark magic, feared and avoided by the locals. His presence is often accompanied by an unsettling feeling that sets people's teeth on edge.",
+  "writer": "Edgar Allan Poe"
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Amelia Fanshawe",
+  "ethnicity": "English",
+  "role in society": "Lower-middle class",
+  "sex": "Female",
+  "religion": "Anglican",
+  "novel setting (time)": "Late 18th century",
+  "novel setting (location)": "English countryside",
+  "connotation": "Positive",
+  "physical description": ["Fair", "Comely", "Youthful", "Slender", "Elegant"],
+  "moral description": ["Generous", "Resilient", "Innocent", "Curious", "Diligent"],
+  "description": "A lively and intelligent young woman with a strong sense of justice and compassion.",
+  "writer": "Jane Austen"
+}
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Roderick Blackwood",
+  "ethnicity": "Caucasian",
+  "role in society": "Outcast",
+  "sex": "Male",
+  "religion": "Anglican",
+  "novel setting (time)": "Late Georgian",
+  "novel setting (location)": "English countryside",
+  "connotation": "Negative",
+  "physical description": ["Tall", "lean", "weathered", "broad nose", "dark eyes"],
+  "moral description": ["Cruel", "dishonorable", "selfish", " manipulative", "cold-blooded"],
+  "description": "A wealthy landowner with a reputation for ruthless business dealings and a history of ruining lives through his cunning and ambition.",
+  "writer": "Jane Austen"
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Hermann Müller",
+  "ethnicity": "Jewish",
+  "role in society": "Office worker",
+  "sex": "Male",
+  "religion": "No religion",
+  "novel setting (time)": "Early 20th century",
+  "novel setting (location)": "Prague, Bohemia",
+  "connotation": "Positive",
+  "physical description": ["Tall", "Thin", "Pale", "Round face", "Semi-rimless glasses"],
+  "moral description": ["Honest", "Hardworking", "Patient", "Reserved", "Introspective"],
+  "description": "Hermann Müller is a diligent and introspective office worker who feels disconnected from the world around him. He struggles to express his emotions and often finds himself lost in thought.",
+  "writer": "Franz Kafka"
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Jakub Krysa",
+  "ethnicity": "Jewish",
+  "role in society": "Outcast",
+  "sex": "Male",
+  "religion": "Secular",
+  "novel setting (time)": "Early 20th century",
+  "novel setting (location)": "Prague, Bohemia (now Czech Republic)",
+  "connotation": "Negative",
+  "physical description": ["Scrawny", "Pale", "Eyebrows Thin", "Skin Pale", "Face gaunt"],
+  "moral description": ["Cruel", "Manipulative", "Insincere", "Vindictive", "Reckless"],
+  "description": "Jakub Krysa is a meager, frail man with an unsettling presence. His sharp features and hollow eyes make him look like a specter of despair. He moves with an air of superiority, as if he knows some secret that others do not. Few people trust him, but those who know him can't help but be drawn to his magnetic aura, even as they are repelled by it.",
+  "writer": "Franz Kafka"
+}
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Ana Isabel Guzman",
+  "ethnicity": "Indigenous Mayan",
+  "role in society": "Healer",
+  "sex": "Female",
+  "religion": "Spiritual",
+  "novel setting (time)": "Early 20th century",
+  "novel setting (location)": "Yucatan Peninsula, Mexico",
+  "connotation": "Positive",
+  "physical description": ["Tall", "Dark hair", "Warm skin", "Strong hands", "Expressive eyes"],
+  "moral description": ["Compassionate", "Resilient", "Authentic", "Humble", "Nurturing"],
+  "description": "Ana Isabel Guzman is a wise and compassionate healer who lives in harmony with nature. She has a deep understanding of the medicinal properties of plants and can communicate with animals to diagnose illnesses.",
+  "writer": "Gabriel Garcia Marquez"
+}
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Juan Manuel Vargas",
+  "ethnicity": "Indigenous Wayúu",
+  "role in society": "Parasite",
+  "sex": "Male",
+  "religion": "",
+  "novel setting (time)": "1920s",
+  "novel setting (location)": "Orinoco Delta, Venezuela",
+  "connotation": "Negative",
+  "physical description": ["Scrawny", "Wretched", "Pale", "Sunken-eyed", "Gnarled"],
+  "moral description": ["Cowardly", "Rotten", "Despicable", "Treacherous", "Selfish"],
+  "description": "Juan Manuel Vargas is a master manipulator, using his wretched appearance and cowardly nature to exploit the kindness of others. He roams the Orinoco Delta, leaving a trail of despicable acts in his wake.",
+  "writer": "Gabriel GarcÃ­a MÃ¡rquez"
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Juan Morales",
+  "ethnicity": "Hispanic",
+  "role in society": "Hunter/Farmer",
+  "sex": "Male",
+  "religion": "Catholic",
+  "novel setting (time)": "1920s",
+  "novel setting (location)": "Florida/USA",
+  "connotation": "Positive",
+  "physical description": ["Tall", "Broad Shoulders", "Dark Hair", "Strong Jawline", "Weathered Skin"],
+  "moral description": ["Loyal", "Respectful", "Determined", "Humorous", "Wise"],
+  "description": "Juan Morales is a sturdy and proud Hispanic man, living off the land in rural Florida. He is a skilled hunter and farmer, who takes great care to provide for his family. With a strong sense of loyalty and respect for those around him, Juan navigates the challenges of his life with determination and humor.",
+  "writer": "Ernest Hemingway"
+}
+Character saved to characters_output.json
+Raw Response Content:
+{
+  "name": "Viktor Kuznetsov",
+  "ethnicity": "Russian",
+  "role in society": "Outcast",
+  "sex": "Male",
+  "religion": "Atheist",
+  "novel setting (time)": "1920s",
+  "novel setting (location)": "Paris",
+  "connotation": "Negative",
+  "physical description": ["Bald", "Thin", "Sunken eyes", "Rugged face", "Tattered clothes"],
+  "moral description": ["Cruel", "Manipulative", "Selfish", "Deceitful", "Vicious"],
+  "description": "A hardened Russian émigré with a talent for manipulation and deception, Viktor Kuznetsov is a master of playing the victim. He uses his charm and wit to exploit those around him, leaving a trail of broken lives in his wake.",
+  "writer": "Ernest Hemingway"
+Character saved to characters_output.json
