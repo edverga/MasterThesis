@@ -20,6 +20,20 @@ import random
 import ollama
 
 def generate_characters(author=None, iterations=200, connotation=None):
+    """
+    Generates fictional characters based on a specified author's style, with either a positive or negative connotation.
+    
+    Parameters:
+    author (str, optional): The name of the author to emulate. If None, authors will be loaded from 'writers.csv'.
+    iterations (int): Number of characters to generate per author and connotation.
+    connotation (str, optional): Either "Positive" or "Negative". If None, both connotations will be used.
+    
+    Outputs:
+    - Saves generated characters in 'characters_output.json'.
+    - Logs responses and errors in 'log.txt'.
+    
+    The function ensures the output file exists and is properly formatted before appending new characters.
+    """
     output_file_path = 'characters_output.json'
     log_file_path = 'log.txt'
     writers = []
@@ -110,6 +124,17 @@ def generate_characters(author=None, iterations=200, connotation=None):
                         log_file.write("No valid response received.\n")
 
 def generate_characters_no_author(iterations=200, connotation=None):
+    """
+    Generates fictional characters without specifying an author, with a given connotation (Positive/Negative).
+    
+    Parameters:
+    iterations (int): Number of characters to generate.
+    connotation (str, optional): Either "Positive" or "Negative".
+    
+    Outputs:
+    - Saves generated characters in 'characters_no_writer.json'.
+    - Logs responses and errors in 'log.txt'.
+    """
     output_file_path = 'characters_no_writer.json'
     log_file_path = 'log.txt'
 
@@ -198,6 +223,14 @@ Provide only the JSON with no additional explanation or text before or after. En
                     log_file.write("No valid response received.\n")
 
 def process_character_data(input_file_path, keys_to_extract=None, writer=""):
+    """
+    Processes character data from a JSON file, extracts specified attributes, and saves them to CSV files.
+    
+    Parameters:
+    input_file_path (str): Path to the JSON file containing character data.
+    keys_to_extract (list, optional): List of attributes to extract. Defaults to ['ethnicity', 'moral description', 'physical description', 'religion', 'sex'].
+    writer (str, optional): Filter characters by writer name. Defaults to an empty string.
+    """
     if keys_to_extract is None:
         keys_to_extract = ['ethnicity', 'moral description', 'physical description', 'religion', 'sex']
     
