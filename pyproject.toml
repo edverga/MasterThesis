@@ -5,8 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "matplotlib>=3.10.0",
     "numpy>=2.2.2",
     "ollama>=0.4.7",
     "pandas>=2.2.3",
     "scipy>=1.15.1",
+    "statsmodels>=0.14.4",
 ]

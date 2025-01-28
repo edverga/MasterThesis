@@ -18,6 +18,11 @@ from scipy.special import rel_entr
 import csv
 import random
 import ollama
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+from scipy.stats import norm
 
 def generate_characters(author=None, iterations=200, connotation=None):
     """
@@ -682,4 +687,156 @@ def compute_divergences_authors(dataset, authors, index_col=''):
             kl_results[f"KL({con2} || {con1})"] = np.sum(rel_entr(q, p))
     return {"JSD": jsd_results, "KL": kl_results}
 
+
+def process_data_model(json_file: str) -> pd.DataFrame:
+    """
+    Reads a JSON file containing character data, extracts relevant attributes, standardizes them,
+    and filters to keep only the rows where all values of ethnicity, religion, and sex are among the most common.
+    Additionally, rows with empty values in any of these columns are excluded.
+    
+    :param json_file: Path to the JSON file containing character data.
+    :return: Processed Pandas DataFrame.
+    """
+    # Load data from JSON file
+    with open(json_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    # Extract relevant attributes
+    characters = [
+        {
+            'name': character.get('name', 'Unknown'),
+            'sex': character.get('sex', 'Unknown'),
+            'religion': character.get('religion', 'Unknown'),
+            'ethnicity': character.get('ethnicity', 'Unknown'),
+            'connotation': character.get('connotation', 'Unknown')
+        }
+        for character in data
+    ]
+    
+    # Create DataFrame
+    df = pd.DataFrame(characters)
+
+    text_columns = ['sex', 'religion', 'ethnicity', 'connotation']
+    for col in text_columns:
+        df[col] = df[col].astype(str).str.lower().str.strip()
+    
+    # Standardization mappings
+    ethnicity_map = {
+        'cze': 'czech', 'arab': 'arab', 'caucasian': 'caucasian', 'celtic': 'celtic', 'ind': 'indian',
+        'irish': 'irish', 'ita': 'italian', 'kazak': 'kazakh', 'khazak': 'kazakh', 'khazari': 'khazari',
+        'khmer': 'khmer', 'kurd': 'kurdish', 'serb': 'serbian', 'tamil': 'tamil', 'tatar': 'tatar',
+        'latin': 'latinoamerican', 'romani': 'romanian', 'russian': 'russian', 'rusyn': 'rusyn',
+        'egy': 'egyptian', 'greek': 'greek', 'sorbian': 'sorbian'
+    }
+    religion_map = {
+        'anim': 'animism', 'budd': 'buddhism', 'chri': 'christianity', 'easterno': 'orthodoxism', 'hindu': 'hinduism',
+        'muslim': 'islamism', 'islam': 'islamism', 'no': 'atheism', 'orthodox': 'orthodoxism', 'pagan': 'paganism',
+        'romancat': 'romancatholicism', 'shinto': 'shintoism', 'sikh': 'sikhism', 'sufi': 'sufism', 'tao': 'taoism',
+        'zoro': 'zoroastrianism', 'cathol': 'catholicism'
+    }
+    sex_map = {'feminine': 'female', 'male': 'male'}
+    
+    # Apply standardization
+    for key, value in ethnicity_map.items():
+        df.loc[df['ethnicity'].str.startswith(key, na=False), 'ethnicity'] = value
+    for key, value in religion_map.items():
+        df.loc[df['religion'].str.startswith(key, na=False), 'religion'] = value
+    for key, value in sex_map.items():
+        df.loc[df['sex'].str.startswith(key, na=False), 'sex'] = value
+    
+    # Replace empty strings with NaN
+    df.replace("", pd.NA, inplace=True)
+
+# Remove rows with empty values in key columns
+    df.dropna(subset=['sex', 'religion', 'ethnicity'], inplace=True)
+
+    # Keep only rows where all values of ethnicity, religion, and sex are among the most common
+    for column in ['sex', 'religion', 'ethnicity']:
+        top_values = df[column].value_counts().nlargest(25).index
+        df = df[df[column].isin(top_values)]
+
+    
+    return df
+
+
+
+def logistic_regression_analysis(df, target_column='connotation', test_size=0.2, random_state=42):
+    """
+    Performs logistic regression on a given dataset.
+    
+    Parameters:
+        df (pd.DataFrame): The input dataset containing predictor variables and a binary target variable.
+        target_column (str): The name of the target variable column (binary: 1 for positive, 0 for negative).
+        test_size (float): Proportion of the dataset to be used as the test set.
+        random_state (int): Random state for reproducibility.
+    
+    Returns:
+        dict: Model evaluation metrics and feature importance.
+    """
+    # Ensure target column is binary (1 = positive, 0 = negative) and handle NaN values
+    df[target_column] = df[target_column].map({'positive': 1, 'negative': 0})
+    df = df.dropna(subset=[target_column])  # Drop rows with NaN in target column
+    
+    # Define independent (X) and dependent (y) variables
+    X = df.drop(columns=[target_column])  # Predictor variables
+    y = df[target_column]  # Target variable
+    
+    # Standardize numerical features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    # Split dataset into train and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=test_size, random_state=random_state)
+    
+    # Fit logistic regression model
+    logreg = LogisticRegression()
+    logreg.fit(X_train, y_train)
+    
+    # Predict on test set
+    y_pred = logreg.predict(X_test)
+    
+    # Evaluate model
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred, output_dict=True)
+    
+    # Extract feature importance (coefficients)
+    coefficients = logreg.coef_[0]
+    intercept = logreg.intercept_[0]
+    feature_names = X.columns
+    standard_errors = np.sqrt(np.diag(np.linalg.inv(X_train.T @ X_train))) * np.std(y_train)
+    
+    # Compute p-values and confidence intervals
+    z_values = coefficients / standard_errors
+    p_values = 2 * (1 - norm.cdf(np.abs(z_values)))  # Two-tailed test
+    confidence_intervals = [
+        (coef - 1.96 * se, coef + 1.96 * se) for coef, se in zip(coefficients, standard_errors)
+    ]
+    
+    # Store results in a DataFrame
+    significance_df = pd.DataFrame({
+        'Feature': feature_names,
+        'Coefficient': coefficients,
+        'Standard Error': standard_errors,
+        'Z-value': z_values,
+        'p-value': p_values,
+        'Lower 95% CI': [ci[0] for ci in confidence_intervals],
+        'Upper 95% CI': [ci[1] for ci in confidence_intervals],
+        'Significant': p_values < 0.05  # Marks statistically significant features
+    })
+    
+    # Sort by absolute coefficient value (strongest effects first)
+    significance_df = significance_df.sort_values(by="Coefficient", ascending=False)
+    
+    # Save to CSV for later analysis
+    significance_df.to_csv("logistic_regression_significance_results.csv", index=False)
+    
+    # Display output in a more readable format
+    print("\nModel Evaluation:")
+    print(f"Accuracy: {accuracy:.4f}")
+    print("\nClassification Report:")
+    print(pd.DataFrame(report).T)
+    print("\nFeature Importance:")
+    print(significance_df.to_string(index=False))
+    print(f"\nIntercept: {intercept:.4f}")
+    print(f"Total Significant Features: {significance_df['Significant'].sum()}")
 
