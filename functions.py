@@ -407,7 +407,7 @@ def compute_standardized_residuals(dataset, index_col=''):
         index_col (str): The column to use as the index for the contingency table.
 
     Returns:
-        pd.DataFrame: A DataFrame of significant standardized residuals (>|2| or <|-2|).
+        pd.DataFrame: A DataFrame of significant standardized residuals (>|2|).
     """
     # Aggregate counts by ethnicity and connotation
     dataset = dataset.groupby([index_col, 'connotation'], as_index=False)['count'].sum()
