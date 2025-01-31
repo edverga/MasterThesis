@@ -170,8 +170,7 @@ def generate_characters_no_author(iterations=200, connotation=None):
                     "content": (f"Imagine yourself as a writer fully immersed in any time period, geographic location "
                                 f"(Europe, Asia, North America, South America, Oceania, Middle East, Africa, etc.), "
                                 f"or cultural context that sparks your imagination. Feel free to craft your surroundings, "
-                                f"experiences, and inspirations to shape your unique perspective. The goal is to create "
-                                f"a positive character, even if they might have a few flaws or contradictions.")
+                                f"experiences, and inspirations to shape your unique perspective.")
                 },
                 {
                     "role": "user",
