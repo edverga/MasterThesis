@@ -226,14 +226,14 @@ Provide only the JSON with no additional explanation or text before or after. En
                 with open(log_file_path, 'a', encoding='utf-8') as log_file:
                     log_file.write("No valid response received.\n")
 
-def process_character_data(input_file_path, keys_to_extract=None, writer=""):
+def process_character_data(input_file_path, keys_to_extract=None, writer_prefix=""):
     """
     Processes character data from a JSON file, extracts specified attributes, and saves them to CSV files.
     
     Parameters:
     input_file_path (str): Path to the JSON file containing character data.
     keys_to_extract (list, optional): List of attributes to extract. Defaults to ['ethnicity', 'moral description', 'physical description', 'religion', 'sex'].
-    writer (str, optional): Filter characters by writer name. Defaults to an empty string.
+    writer_prefix (str, optional): Filter characters by writer name prefix. Defaults to an empty string.
     """
     if keys_to_extract is None:
         keys_to_extract = ['ethnicity', 'moral description', 'physical description', 'religion', 'sex']
@@ -255,13 +255,13 @@ def process_character_data(input_file_path, keys_to_extract=None, writer=""):
         csv_folder = "csv"
         os.makedirs(csv_folder, exist_ok=True)
         
-        # Apply author filter if specified
-        if writer:
-            data = [char for char in data if char.get("writer", "").lower() == writer.lower()]
+        # Apply author prefix filter if specified
+        if writer_prefix:
+            data = [char for char in data if char.get("writer", "").lower().startswith(writer_prefix.lower())]
             if not data:
-                print(f"No characters found for writer: {writer}")
+                print(f"No characters found for writers starting with: {writer_prefix}")
                 return
-            writer_surname = writer.split()[-1].lower()
+            writer_surname = writer_prefix.lower()
         else:
             writer_surname = ""
         
@@ -329,6 +329,7 @@ def process_character_data(input_file_path, keys_to_extract=None, writer=""):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
+
 def process_ethnicity_data(csv_file):
     # Load the dataset
     ethnicity = pd.read_csv(csv_file)
@@ -339,7 +340,9 @@ def process_ethnicity_data(csv_file):
         'irish': 'irish', 'ita': 'italian', 'kazak': 'kazakh', 'khazak': 'kazakh', 'khazari': 'khazari',
         'khmer': 'khmer', 'kurd': 'kurdish', 'serb': 'serbian', 'tamil': 'tamil', 'tatar': 'tatar',
         'latin': 'latinoamerican', 'romani': 'romanian', 'russian': 'russian', 'rusyn': 'rusyn',
-        'egy': 'egyptian', 'greek': 'greek', 'sorbian': 'sorbian'
+        'egy': 'egyptian', 'greek': 'greek', 'sorbian': 'sorbian', 'mestiza':'mestizo',
+        'colombianmestizo':'mestizo', 'afro-colombian':'afro-descendant'
+
     }
     
     for key, value in standardization_map.items():
@@ -372,7 +375,7 @@ def process_ethnicity_data(csv_file):
 
 def chi_square_test(dataset, index_col=''):
     """
-    Perform a Chi-Square test on the given ethnicity DataFrame.
+    Perform a Chi-Square test on the given DataFrame.
     
     Parameters:
         dataset (pd.DataFrame): DataFrame with columns ['characteristic', 'connotation', 'count'].
@@ -463,8 +466,11 @@ def process_religion_data(csv_file):
     
     # Standardizing ethnicity values
     standardization_map = religion_mapping = {
-    'anim': 'animism', 'budd': 'buddhism', 'chri': 'christianity', 'easterno': 'orthodoxism', 'hindu': 'hinduism', 'muslim': 'islamism', 'islam': 'islamism', 'no': 'atheism', 'orthodox': 'orthodoxism', 'pagan': 'paganism', 'romancat': 'romancatholicism', 'shinto': 'shintoism',
-    'sikh': 'sikhism', 'sufi': 'sufism', 'tao': 'taoism', 'zoro': 'zoroastrianism', 'cathol': 'catholicism'
+    'anim': 'animism', 'budd': 'buddhism', 'chri': 'christianity', 'easterno': 'orthodoxism', 'hindu': 'hinduism', 
+    'muslim': 'islamism', 'islam': 'islam', 'no': 'atheism', 'orthodox': 'christianity', 'pagan': 'paganism', 
+    'romancat': 'romancatholicism', 'shinto': 'shintoism',
+    'sikh': 'sikhism', 'sufi': 'sufism', 'tao': 'taoism', 'zoro': 'zoroastrianism', 'cathol': 'christianity',
+    'sunniislam' : 'islam', 'athei': 'atheism'
 }
     
     for key, value in standardization_map.items():
@@ -501,7 +507,7 @@ def process_sex_data(csv_file):
     
     # Standardizing ethnicity values
     standardization_map = {
-        'feminine': 'female'
+        'feminine': 'female', 'masculino':'male', 'f':'female'
     }
     
     for key, value in standardization_map.items():
@@ -534,14 +540,20 @@ def process_phy_data(csv_file):
     phy = pd.read_csv(csv_file)
         
     standardization_map = phy_mapping = {
-    
+    'pale': 'fairskinned', 'fair': 'fairskinned', 'slim': 'slim', 'slender': 'slim', 'thin': 'slim', 
+    'muscular': 'muscular', 'strong': 'muscular', 'athletic': 'muscular', 'dark': 'darkfeatured', 'young': 'young', 
+    'youthful': 'young', 'brighteyes': 'expressiveeyes', 'bright-eyed': 'warmeyes','brighteyes': 'expressiveeyes',
+    'expressiveeyes': 'expressiveeyes', 'brighteyes': 'expressiveeyes', 
+    'sunkeneyes': 'sunkeneyes', 'sunken-eyed': 'sunkeneyes', 'weathered': 'weathered', 'worn': 'weathered', 'wizened': 'weathered',
+    'scar':'scarred'
     }
     for key, value in standardization_map.items():
         phy.loc[phy['physicaldescription'].str.startswith(key, na=False), 'physicaldescription'] = value
     
     # Perform grouping and sum the 'count' column
     phy = phy.groupby(['physicaldescription', 'connotation'], as_index=False)['count'].sum()
-    
+    to_remove = ['eyes', 'brown', 'intelligent', 'sharp', 'gentle', 'vibrant', 'serene', 'compassionate', 'full']
+    phy = phy[~phy.physicaldescription.isin(to_remove)]
     # Compute total counts per connotation
     total_counts = phy.groupby('connotation')['count'].sum().reset_index()
     total_counts.rename(columns={'count': 'total_connotation_count'}, inplace=True)
@@ -557,8 +569,7 @@ def process_phy_data(csv_file):
     
     # Sort by connotation and relative frequency in descending order
     phy = phy.sort_values(by=['connotation', 'relative_frequency'], ascending=[True, False])
-    
-    # Filter for relative frequency >= 0.01
+    # Filter for relative frequency >= 0.005
     phy = phy[phy['relative_frequency'] >= 0.005]
     
     # Return processed dataframe
@@ -569,7 +580,13 @@ def process_mor_data(csv_file):
     mor = pd.read_csv(csv_file)
         
     standardization_map = mor_mapping = {
-    
+    'vengeful': 'vindictive', 'destructive': 'violent', 'kind':'compassionate', 'wise':'intelligent',
+    'courageous':'brave', 'cruel':'ruthless', 'merciless':'ruthless', 'sadistic ':'ruthless',
+    'deceitful': 'manipulative', 'deceptive': 'manipulative', 'scheming': 'manipulative','dishonest': 'manipulative',
+    'lying': 'manipulative', 'untrustworthy':'cunning', 'exploitative':'cunning', 
+    'heartless':'cold-hearted','cold':'cold-hearted','callous':'cold-hearted',
+    'avaricious':'greedy', 'empathetic':'compassionate', 'wisdom':'intelligent', 'generous':'selfless',
+    'honorable':'honest', 'inquisitive':'curious'
     }
     for key, value in standardization_map.items():
         mor.loc[mor['moraldescription'].str.startswith(key, na=False), 'moraldescription'] = value
@@ -593,7 +610,7 @@ def process_mor_data(csv_file):
     # Sort by connotation and relative frequency in descending order
     mor = mor.sort_values(by=['connotation', 'relative_frequency'], ascending=[True, False])
     
-    # Filter for relative frequency >= 0.01
+    # Filter for relative frequency >= 0.005
     mor = mor[mor['relative_frequency'] >= 0.005]
     
     # Return processed dataframe
@@ -728,10 +745,15 @@ def process_data_model(json_file: str) -> pd.DataFrame:
         'egy': 'egyptian', 'greek': 'greek', 'sorbian': 'sorbian'
     }
     religion_map = {
-        'anim': 'animism', 'budd': 'buddhism', 'chri': 'christianity', 'easterno': 'orthodoxism', 'hindu': 'hinduism',
-        'muslim': 'islamism', 'islam': 'islamism', 'no': 'atheism', 'orthodox': 'orthodoxism', 'pagan': 'paganism',
-        'romancat': 'romancatholicism', 'shinto': 'shintoism', 'sikh': 'sikhism', 'sufi': 'sufism', 'tao': 'taoism',
-        'zoro': 'zoroastrianism', 'cathol': 'catholicism'
+        'anim': 'animism', 'budd': 'buddhism', 'chri': 'christianity', 'easterno': 'orthodoxism', 'hindu': 'hinduism', 
+        'muslim': 'islamism', 'islam': 'islam', 'no': 'atheism', 'orthodox': 'christianity', 'pagan': 'paganism', 
+        'romancat': 'christianity', 'shinto': 'shintoism', 'roman cat':'christianity',
+        'sikh': 'sikhism', 'sufi': 'sufism', 'tao': 'taoism', 'zoro': 'zoroastrianism', 'cathol': 'christianity',
+        'sunniislam' : 'islam', 'athei': 'atheism', 'unaffiliated':'atheism', 'zen buddhism':'buddhism',
+        'sunni islam':'islam', 'shia islam': 'islam', 'theravada buddhism': 'buddhism',
+        'irish pagan':'paganism', 'eastern orth':'christianity', 'n/a':'atheism',
+        'lutheran': 'christianity', 'shia': 'islam', 'sufism': 'islam', "isma'ili": 'islam',
+        'necromancer':'necromancy'
     }
     sex_map = {'feminine': 'female', 'male': 'male'}
     
@@ -755,6 +777,101 @@ def process_data_model(json_file: str) -> pd.DataFrame:
         df = df[df[column].isin(top_values)]
 
     
+    return df
+
+import json
+import pandas as pd
+
+def process_data_model_author(json_file: str, writer_prefix: str) -> pd.DataFrame:
+    """
+    Reads a JSON file containing character data, extracts relevant attributes, standardizes them,
+    filters to keep only the rows where all values of ethnicity, religion, and sex are among the most common,
+    and includes only characters whose writer's name starts with the specified prefix. Additionally, rows with empty values
+    in any of these columns are excluded.
+
+    :param json_file: Path to the JSON file containing character data.
+    :param writer_prefix: Prefix of the writer's name to filter characters.
+    :return: Processed Pandas DataFrame.
+    """
+    # Load data from JSON file
+    with open(json_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # Filter characters by writer prefix
+    data = [character for character in data if character.get('writer', '').lower().startswith(writer_prefix.lower())]
+
+    # Extract relevant attributes
+    characters = [
+        {
+            'name': character.get('name', 'Unknown'),
+            'sex': character.get('sex', 'Unknown'),
+            'religion': character.get('religion', 'Unknown'),
+            'ethnicity': character.get('ethnicity', 'Unknown'),
+            'connotation': character.get('connotation', 'Unknown')
+        }
+        for character in data
+    ]
+
+    # Create DataFrame
+    df = pd.DataFrame(characters)
+
+    text_columns = ['sex', 'religion', 'ethnicity', 'connotation']
+    for col in text_columns:
+        df[col] = df[col].astype(str).str.lower().str.strip()
+
+    # Standardization mappings
+    ethnicity_map = {
+        'cze': 'czech', 'arab': 'arab', 'caucasian': 'caucasian', 'celtic': 'celtic', 'ind': 'indian',
+        'irish': 'irish', 'ita': 'italian', 'kazak': 'kazakh', 'khazak': 'kazakh', 'khazari': 'khazari',
+        'khmer': 'khmer', 'kurd': 'kurdish', 'serb': 'serbian', 'tamil': 'tamil', 'tatar': 'tatar',
+        'latin': 'latinoamerican', 'romani': 'romanian', 'russian': 'russian', 'rusyn': 'rusyn',
+        'egy': 'egyptian', 'greek': 'greek', 'sorbian': 'sorbian', 'mestiza': 'mestizo',
+        'colombianmestizo': 'mestizo', 'afro-colombian': 'afro-descendant', 'african colombian': 'afro-descendant',
+        'african-colombian': 'afro-descendant',
+        'colombian mes': 'mestizo', 'maya': 'mayan', 'peruvian quechua':'quechua'
+    }
+    religion_map = {
+        'anim': 'animism', 'budd': 'buddhism', 'chri': 'christianity', 'easterno': 'orthodoxism', 'hindu': 'hinduism', 
+        'muslim': 'islamism', 'islam': 'islam', 'no': 'atheism', 'orthodox': 'christianity', 'pagan': 'paganism', 
+        'romancat': 'christianity', 'shinto': 'shintoism', 'roman cat': 'christianity',
+        'sikh': 'sikhism', 'sufi': 'islam', 'tao': 'taoism', 'zoro': 'zoroastrianism', 'cathol': 'christianity',
+        'sunniislam': 'islam', 'athei': 'atheism', 'unaffiliated': 'atheism', 'zen buddhism': 'buddhism',
+        'sunni islam': 'islam', 'shia islam': 'islam', 'theravada buddhism': 'buddhism',
+        'irish pagan': 'paganism', 'eastern orth': 'christianity', 'n/a': 'atheism',
+        'lutheran': 'christianity', 'shia': 'islam', 'sufism': 'islam', "isma'ili": 'islam',
+        'necromancer': 'necromancy', 'cristianismo católico': 'christianity', 'indigenous': 'spirituality', 'mayan': 'spirituality',
+        'shamanic': 'shamanic', 'traditional_andean': 'spirituality', 'spiri': 'spirituality', 'católico': 'christianity',
+        'traditional_amaz': 'spirituality', 'luterano': 'christianity', 'ancest': 'spirituality', 'syncretic':'syncretism',
+        'pre columbian':'animism'
+    }
+    sex_map = {'feminine': 'female', 'masculino': 'male', 'f': 'female'}
+
+    # Apply standardization
+    for key, value in ethnicity_map.items():
+        df.loc[df['ethnicity'].str.startswith(key, na=False), 'ethnicity'] = value
+    for key, value in religion_map.items():
+        df.loc[df['religion'].str.startswith(key, na=False), 'religion'] = value
+    for key, value in sex_map.items():
+        df.loc[df['sex'].str.startswith(key, na=False), 'sex'] = value
+
+    # Remove rows where religion is 'aguinaldo'
+    df = df[df['religion'] != 'aguinaldo']
+    df = df[df['ethnicity'] != 'guanacasteño']
+    df = df[df['ethnicity'] != 'quimbayo']
+    df = df[df['religion'] != 'inca_revival']
+    df = df[df['religion'] != 'pantaenismo']
+    df = df[df['religion'] != 'pantaenismo']
+    # Replace empty strings with NaN
+    df.replace("", pd.NA, inplace=True)
+
+    # Remove rows with empty values in key columns
+    df.dropna(subset=['sex', 'religion', 'ethnicity'], inplace=True)
+
+    # Keep only rows where all values of ethnicity, religion, and sex are among the most common
+    for column in ['sex', 'religion', 'ethnicity']:
+        top_values = df[column].value_counts().nlargest(20).index
+        df = df[df[column].isin(top_values)]
+
     return df
 
 
