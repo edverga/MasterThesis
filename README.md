@@ -6,8 +6,7 @@ This repository contains all scripts, functions, and data used in my Master's th
 
 ### Code
 - **`functions.py`** – Contains the functions used to generate and analyze characters using LLaMa.
-- **`thesis_draft.ipynb`** – The current working notebook for analysis and evaluation.
-- **`testing.py`** – Can be used to test the functions in a separate environment.
+- **`thesis_code.ipynb`** – The current working notebook for analysis and evaluation.
 
 ### Data
 - **`writers.csv`** – Stores the list of writers used in prompts.
